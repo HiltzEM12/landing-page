@@ -5,16 +5,13 @@
  * scrolls to anchors from navigation,
  * and highlights section in viewport upon scrolling.
  * 
+ * Eric Hiltz 5/5/2020
+ * 
  * Dependencies: None
  * 
  * JS Version: ES2015/ES6
  * 
  * JS Standard: ESlint
- * 
- */
-
-/**
- * Define Global Variables
  * 
  */
 
@@ -27,46 +24,21 @@ const navBarList = navBar.querySelector('#navbar__list');
 //  All sections held in a node list
 const sections = document.querySelectorAll('section');
 
-/**
- * End Global Variables
- * Start Helper Functions
- * 
- */
-
-// // Function to get the bottom coordinates of a given element
-// function getBottom(elem) {
-//     const coordinates = elem.getBoundingClientRect();
-//     return coordinates.top;
-// }
-
 // Check if an element is in the viewport
 // Only checks vertical position since there's no horizontal scrolling
-function inViewport(elem){
+function inViewport(elem) {
     const pos = elem.getBoundingClientRect();
-    return ((pos.top >= 0)) &&
-        pos.bottom <= Math.max(window.innerHeight,document.documentElement.clientHeight);
+    // Return boolean of if the element is within the vieport bounds
+    return (pos.top >= 0 &&
+        pos.left >= 0 &&
+        pos.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+        pos.bottom <= (window.innerHeight || document.documentElement.clientHeight));
 }
 
 // Translates the data attribute to it's ID
 function dataToID(txt) {
     return txt.split(' ').join('').toLowerCase();
 }
-
-// //Function to scroll to the active class
-// function scrollToElement(elem){
-//     window.scrollToElement(elem);
-//     // window.scrollTo({
-//     //     top: getBottom(elem) - window.screenY,
-//     //     behavior: 'smooth'
-//     // });
-// }
-
-
-/**
- * End Helper Functions
- * Begin Main Functions
- * 
- */
 
 // build the nav
 // Function to get the navigation list elements
@@ -94,18 +66,10 @@ function addNavListeners() {
 
 // Function for navigation click listener
 function navClick(event) {
-
     // Get element of what to go to.  Id is determined by the list name
-    // const aClass = document.querySelector('.your-active-class'); // Active class
     const idName = dataToID(event.target.textContent);
     const elem = document.querySelector('#' + idName);
 
-    // // Check if the link is to the currently active section
-    // if (elem !== aClass) {
-    //     // If link is to a new section, change the active section
-    //     aClass.classList.toggle('your-active-class');
-    //     elem.classList.toggle('your-active-class');
-    // }
     // Scroll to the selected element
     // Scrolling will handle the active
     elem.scrollIntoView({
@@ -116,40 +80,27 @@ function navClick(event) {
 // Function to use in the scrolling event
 // Goes through each section and checks if its in the viewport
 function scrollListener(event) {
+    console.log('scroll start');
     for (let i = 0; i < sections.length; i++) {
         const elem = sections[i];
-        const inView = inViewport(elem);  // Done here instead of multple times
-        const aClass = elem.classList.contains('your-active-class'); 
-        if(inView && !aClass){ // In viewport and not already active
+        const inView = inViewport(elem.querySelector('h2')); // Done here instead of multple times
+        const aClass = elem.classList.contains('your-active-class');
+        if (inView && !aClass) { // In viewport and not already active
             elem.classList.add('your-active-class');
-        }
-        else if(!inView){ //Not in viewport
+        } else if (!inView) { //Not in viewport
             elem.classList.remove('your-active-class');
         }
     }
+    console.log('scroll end');
 }
 
-
-// Add class 'active' to section when near top of viewport
-
-
-// Scroll to anchor ID using scrollTO event
 
 // Opening function that runs on the onLoad event
 function openingFunc() {
     //Add the navigation fields
     addNavs();
     //Add a scroll listener to the window
-    window.addEventListener('scroll', scrollListener)
+    window.addEventListener('scroll', function () {
+        setTimeout(scrollListener, 0) // Add to the event loop
+    });
 }
-/**
- * End Main Functions
- * Begin Events
- * 
- */
-
-// Build menu 
-
-// Scroll to section on link click
-
-// Set sections as active
