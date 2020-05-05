@@ -11,12 +11,12 @@
  * 
  * JS Standard: ESlint
  * 
-*/
+ */
 
 /**
  * Define Global Variables
  * 
-*/
+ */
 
 // Then nav bar element
 const navBar = document.querySelector('.navbar__menu');
@@ -31,16 +31,24 @@ const sections = document.querySelectorAll('section');
  * End Global Variables
  * Start Helper Functions
  * 
-*/
+ */
 
-// Function to get the bottom coordinates of a given element
-function getBottom(elem){
-    const coordinates = elem.getBoundingClientRect();
-    return coordinates.top;
+// // Function to get the bottom coordinates of a given element
+// function getBottom(elem) {
+//     const coordinates = elem.getBoundingClientRect();
+//     return coordinates.top;
+// }
+
+// Check if an element is in the viewport
+// Only checks vertical position since there's no horizontal scrolling
+function inViewport(elem){
+    const pos = elem.getBoundingClientRect();
+    return ((pos.top >= 0)) &&
+        pos.bottom <= Math.max(window.innerHeight,document.documentElement.clientHeight);
 }
 
 // Translates the data attribute to it's ID
-function dataToID(txt){
+function dataToID(txt) {
     return txt.split(' ').join('').toLowerCase();
 }
 
@@ -58,16 +66,16 @@ function dataToID(txt){
  * End Helper Functions
  * Begin Main Functions
  * 
-*/
+ */
 
 // build the nav
 // Function to get the navigation list elements
-function addNavs(){
+function addNavs() {
 
     const docFrag = document.createDocumentFragment(); // Document frag to add to
 
-    for(let i = 0; i < sections.length; i++){
-        const listItem = document.createElement('li');  // Create the new item
+    for (let i = 0; i < sections.length; i++) {
+        const listItem = document.createElement('li'); // Create the new item
         listItem.textContent = sections[i].dataset.nav; // Add the name of each section
         docFrag.appendChild(listItem); // Add the item to the doc frag
     }
@@ -77,37 +85,48 @@ function addNavs(){
 }
 
 // Wrapper for adding the nav click listeners
-function addNavListeners(){
+function addNavListeners() {
     const li = navBarList.querySelectorAll('li') // Linst nodes in the ul
-    for(let i = 0; i < li.length; i++){
+    for (let i = 0; i < li.length; i++) {
         li[i].addEventListener('click', navClick); //Add the event listener to the nav bar options
     }
 }
 
 // Function for navigation click listener
-function navClick(event){
+function navClick(event) {
 
     // Get element of what to go to.  Id is determined by the list name
-    const aClass = document.querySelector('.your-active-class'); // Active class
+    // const aClass = document.querySelector('.your-active-class'); // Active class
     const idName = dataToID(event.target.textContent);
-    const elem = document.querySelector('#'+ idName);
-    
-    // Check if the link is to the currently active section
-    if (elem !== aClass){
-        // If link is to a new section, change the active section
-        aClass.classList.toggle('your-active-class');
-        elem.classList.toggle('your-active-class');
-    }
+    const elem = document.querySelector('#' + idName);
+
+    // // Check if the link is to the currently active section
+    // if (elem !== aClass) {
+    //     // If link is to a new section, change the active section
+    //     aClass.classList.toggle('your-active-class');
+    //     elem.classList.toggle('your-active-class');
+    // }
+    // Scroll to the selected element
+    // Scrolling will handle the active
     elem.scrollIntoView({
         behavior: 'smooth'
     });
-    // Scroll to the active section
-    // scrollToElement(elem);
 }
 
 // Function to use in the scrolling event
-function scrollListener(event){
-    console.log(event)
+// Goes through each section and checks if its in the viewport
+function scrollListener(event) {
+    for (let i = 0; i < sections.length; i++) {
+        const elem = sections[i];
+        const inView = inViewport(elem);  // Done here instead of multple times
+        const aClass = elem.classList.contains('your-active-class'); 
+        if(inView && !aClass){ // In viewport and not already active
+            elem.classList.add('your-active-class');
+        }
+        else if(!inView){ //Not in viewport
+            elem.classList.remove('your-active-class');
+        }
+    }
 }
 
 
@@ -117,22 +136,20 @@ function scrollListener(event){
 // Scroll to anchor ID using scrollTO event
 
 // Opening function that runs on the onLoad event
-function openingFunc(){
+function openingFunc() {
     //Add the navigation fields
     addNavs();
     //Add a scroll listener to the window
-    window.addEventListener('scroll',scrollListener)
+    window.addEventListener('scroll', scrollListener)
 }
 /**
  * End Main Functions
  * Begin Events
  * 
-*/
+ */
 
 // Build menu 
 
 // Scroll to section on link click
 
 // Set sections as active
-
-
